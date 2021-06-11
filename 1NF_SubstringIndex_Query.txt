@@ -1,0 +1,12 @@
+select distinct course,substring_index(substring_index(t.content,',',n.n),',',-1) content
+from course_content
+
+course    content                     n
+Prog      Java,C++                    1
+Web       HTML,PHP,ASP                1
+Script    Javascript,Jquery           1
+Prog      Java,C++                    2
+Web       HTML,PHP,ASP                2
+Script    Javascript,Jquery           2
+Prog      Java,C++
+Web  

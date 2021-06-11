@@ -1,0 +1,394 @@
+
+############Create Before Insert Trigger in SQL###########
+1.
+Create Table Stu_Table
+(Stu_Id int,Stu_Name Varchar(15),Sub1 int,Sub2 int,Sub3 int,
+Sub4 int,Sub5 int,total int,per float,status varchar(15));
+
+
+
+delimiter $$
+CREATE TRIGGER stu_insert
+Before Insert ON stud_table FOR EACH ROW
+BEGIN
+	set new.total = new.sub1 + new.sub2 +new.sub3 +
+			new.sub4 +new.sub5;
+	set new.per = new.total/5;
+	if new.per<33 then 
+		set new.status="fail";
+	elseif new.per>=33 and new.per<45 then
+		set new.status="3rd Div";
+	elseif new.per>=45 and new.per<60 then
+		set new.status="2nd  Div";
+	else
+		set new.status="1st Div";
+	end if;
+END$$
+delimiter ;
+
+insert into stud_table( Stu_Id, Stu_Name, sub1, sub2, sub3, sub4, sub5)
+			 values (1, 'Ashish', 6, 6, 6, 6, 6);
+
+insert into stud_table( Stu_Id, Stu_Name, sub1, sub2, sub3, sub4, sub5)
+			 values (2, 'Bobby', 33, 33, 33, 33, 40);
+
+insert into stud_table( Stu_Id, Stu_Name, sub1, sub2, sub3, sub4, sub5)
+			 values (3, 'Chetan', 45, 45, 45, 45, 50);
+
+insert into stud_table( Stu_Id, Stu_Name, sub1, sub2, sub3, sub4, sub5)
+			 values (4, 'Divya', 67, 67, 67, 67, 67);
+
+select * from stu_table;
+
+#########Create After Insert Trigger in SQL###########
+2.
+Create Table Stu_Table1( Stu_Id int, Stu_Name varchar(15),Stu_Class int);
+
+Create table stu_log( user_id VARCHAR(15), description VARCHAR(100));
+
+delimiter $$
+      CREATE TRIGGER stu_insert2
+      AFTER insert ON stu_table1 FOR EACH ROW
+BEGIN
+
+	INSERT into stu_log(user_id, description)
+                   VALUES (user(), CONCAT('Insert Student record ',
+	new.stu_id,' ',new.stu_name,' ',new.stu_class));
+
+END$$
+delimiter ;
+
+insert into stu_table1 values(1, 'Komal',10);
+insert into stu_table1 values(2, 'Ajay',10);
+insert into stu_table1 values(3, 'Santosh',10);
+insert into stu_table1 values(4, 'Rakesh',10);
+insert into stu_table1 values(5, 'Bhau',10);
+
+select * from stu_table1;
+
+select * from stu_log;
+
+################Mysql Trigger after Update#################
+3.
+CREATE TABLE Employee(
+             id            int,
+             first_name    VARCHAR(30),
+             last_name     VARCHAR(15),
+             start_date    DATE,
+             end_date      DATE,
+             city          VARCHAR(10),
+             description   VARCHAR(15)
+         );
+insert into Employee values 
+(01,'Girish','Tewari','20081225',  '20100625','Nainital','Programmer');
+
+insert into Employee values 
+(02,'Komal','Choudhry','20071122', '20100421','Meerut','Programmer');
+
+insert into Employee values 
+(03,'Mahendra','Singh','20061012',  '20070512','Lucknow','Programmer');
+
+select * from employee;
+
+ CREATE TABLE Employee_log(
+         user_id       VARCHAR(15),
+         description   VARCHAR(100)
+     );
+
+select * from employee_log;
+
+delimiter $$
+CREATE TRIGGER Employee_Trigger
+AFTER UPDATE ON employee
+ FOR EACH ROW
+ BEGIN
+   INSERT into Employee_log
+    (user_id, description)VALUES (user(),
+    CONCAT('Id with ',NEW.id,' is modified ',
+    ' from ',OLD.start_date, ' to ', NEW.start_date));
+     END$$
+
+delimiter ;
+
+update employee set start_date='20061231';
+
+update employee set start_date='20071111'
+  where id=1;
+
+select * from employee_log;
+
+###############Mysql Trigger After Delete############
+4.
+CREATE TABLE Emp(
+      id            int,
+        first_name    VARCHAR(30),
+           last_name     VARCHAR(15),
+        start_date    DATE,
+       end_date      DATE,
+        city          VARCHAR(10),
+        description   VARCHAR(15)
+     );
+
+insert into Emp values 
+(01,'Girish','Tewari','20081225',  '20100625','Nainital','Programmer');
+
+insert into Emp values 
+(02,'Komal','Choudhry','20071122', '20100421','Meerut','Programmer');
+
+ insert into Emp values 
+(03,'Mahendra','Singh','20061012',  '20070512','Lucknow','Programmer');
+
+insert into emp values 
+(4,'Amit','Kumar','20081225','20101203','Lucknow','Programmer');
+
+select * from emp;
+
+CREATE TABLE Emp_log(
+  id int,
+   first_name varchar(50),
+  last_name varchar(50),
+start_date date,
+   end_date date,
+    city varchar(50),
+    description varchar(50),
+   Lastinserted Time
+       );
+
+select * from emp_log;
+
+drop trigger if exists Employee_Trigger;
+
+delimiter $$
+CREATE TRIGGER Emp_Trigger
+AFTER delete ON emp
+FOR EACH ROW
+BEGIN
+insert into emp_log values(old.id,old.first_name,
+old.last_name,old.start_date,old.end_date,
+old.city,old.description,curtime());
+ END$$
+delimiter ;
+
+delete from emp where id =4;
+
+select * from emp_log;
+
+Assignment: Examples for before update and before delete.
+
+### triggers in the current database####
+1. show triggers;
+
+2. show triggers LIKE '%stu_table%';
+
+### by giving database name and trigger name###
+3. SELECT 
+    *
+ FROM
+    information_schema.triggers
+WHERE
+    trigger_schema = 'crm'
+   AND trigger_name = 'stu_insert';
+
+#### All triggers from a particular db######
+4. SELECT  * FROM information_schema.triggers
+WHERE trigger_schema = 'crm';
+
+######### All triggers associated with particular table########
+5. SELECT  * FROM information_schema.triggers
+WHERE trigger_schema = 'database_name'
+        AND event_object_table = 'table_name';
+
+### trigger from database######
+
+6. SHOW TRIGGERS FROM crm;
+
+
+
+############### Stored Procedure ##############
+1.Create a simple procedure to print 'Hello World!'.
+CREATE PROCEDURE p1()
+  SELECT 'Hello World!' AS Output;
+
+CALL p1();
+or
+CALL p1;
+
+2.Create a procedure to select all rows from student table.
+CREATE PROCEDURE ListStudents()
+  SELECT *
+  FROM Stud_table1;
+
+CALL ListStudents();
+
+We want only Stu_Id and stu_Name then,
+
+3. Drop procedure ListStudents
+DROP PROCEDURE IF EXISTS ListStudents;
+
+4. To retrieve only student Id and stud name then:-
+CREATE PROCEDURE ListStudents()
+SELECT Stu_ID, stu_Name
+FROM Stud_table1;
+
+CALL ListStudents();
+
+5. Create a procedure to pass your name as parameter
+and print hello with your name.
+CREATE PROCEDURE p3(IN myname VARCHAR(20))
+SELECT CONCAT('Hello ', myname, '!') AS Greeting;
+
+call p3('Ankita');
+
+6.Create a procedure that uses IN parameter in the select where clause.
+create procedure p4(in myname varchar(20))
+select * from stud_table where stu_name=myname;
+
+call p4('chetan');
+
+7. Create a procedure that uses two IN parameters.
+CREATE PROCEDURE saySomething(IN phrase VARCHAR(20),
+ IN name VARCHAR(20))
+ SELECT CONCAT(phrase, ' ', name, '!') AS Output;
+ 
+CALL saySomething('Go','Blue Jays');
+CALL saySomething('Do','my homework') ;
+
+
+
+7. Create a procedure using where clause which finds thedetails of student using ID.
+
+
+
+
+
+
+
+CREATE PROCEDURE FindStudent(IN id INT)
+SELECT Stu_ID, CONCAT(Stu_Name, ' ', Stu_Class) AS 'Details'
+FROM Stud_table1 WHERE Stu_ID = id;
+  
+CALL FindStudent(4);
+
+
+##we must use BEGIN/END if we have a compound statement:
+8. Create a procedure that takes an integer as input and displays 2 columns 
+as output.
+
+DELIMITER //
+CREATE PROCEDURE mySign(IN x INT)
+BEGIN
+  IF x > 0 THEN
+    SELECT x AS Number, '+' AS Sign;
+  ELSEIF x < 0 THEN
+    SELECT x AS Number, '-' AS Sign;
+  ELSE
+    SELECT x AS Number, 'Zero' AS Sign;
+  END IF;
+END//
+delimiter ;
+
+CALL mySign(2);
+CALL mySign(-5);
+CALL mySign(0);
+
+9.Create a procedure that takes 2 integers as input and calculates its sum and
+product.
+
+delimiter //
+CREATE PROCEDURE calculator(IN x INT, IN y INT, OUT sum INT, OUT product INT, INOUT INC INT)
+BEGIN
+  SET sum = x + y;
+  SET product = x * y;
+  SET inc=inc+1;
+END;
+END//
+
+delimiter ;
+
+
+SET @i=50;
+CALL calculator(4,5,@s,@p,@i);
+
+SELECT @s;
+SELECT @p;
+SELECT @i;
+
+11. Procedure using CASE statement.
+
+delimiter //
+CREATE PROCEDURE digitName(IN x INT)
+BEGIN
+
+  DECLARE result VARCHAR(20);
+
+  CASE x
+    WHEN 0 THEN SET result = 'Zero';
+    WHEN 1 THEN SET result = 'One';
+    WHEN 2 THEN SET result = 'Two';
+    WHEN 3 THEN SET result = 'Three';
+    WHEN 4 THEN SET result = 'Four';
+    WHEN 5 THEN SET result = 'Five';
+    WHEN 6 THEN SET result = 'Six';
+    WHEN 7 THEN SET result = 'Seven';
+    WHEN 8 THEN SET result = 'Eight';
+    WHEN 9 THEN SET result = 'Nine';
+    ELSE SET result = 'Not a digit';
+  END CASE;
+
+  SELECT x AS Digit, result AS Name;
+
+END//
+delimiter ;
+
+CALL digitName(0) ;
+CALL digitName(4) ;
+CALL digitName(100) ;
+
+
+#### CASE statement Example #######
+13.
+SELECT  name, sales, 
+CASE 
+	WHEN sales > 250 THEN 'over 250’
+	WHEN sales > 200 THEN '201-250’
+	WHEN sales > 175 THEN '176-200’
+		 ELSE '175 or under’ 
+END AS sales_group
+FROM store_information;
+
+
+########## Functions#######
+#1.Create a simple hello world function
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+CREATE FUNCTION hello_world() RETURNS TEXT
+RETURN 'Hello World';
+
+SELECT hello_world();
+
+#2.Drop the function
+DROP FUNCTION IF EXISTS hello_world;
+
+#3. and re create it using name passed as paramaeter
+
+CREATE FUNCTION hello_world(myname varchar(20)) returns varchar(30)
+ RETURN CONCAT('Hello ', myname);
+
+SELECT hello_world('Earth') as greeting;
+
+# 3. Create a function that takes the cost as input and 
+#returns the tax incurred on it
+
+DELIMITER //
+CREATE FUNCTION myProc (cost DECIMAL(10,2)) 
+RETURNS DECIMAL(10,2)
+BEGIN
+    DECLARE order_tax DECIMAL(10,2);
+    SET order_tax = cost * 0.05;
+    RETURN order_tax;
+END//
+delimiter ;
+ 
+select myProc(123.45);
+

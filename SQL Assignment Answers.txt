@@ -1,0 +1,18 @@
+-- Please send the relevant SQL code to answer the following questions:
+-- 1. What’s the total sales amount for each month among customers who are older than 18?
+Select Sum(a.amount) as total_sales_amount,month(a.order_datetime),b.age 
+from orders a inner join customer b 
+on a.customer_id=b.customer_id 
+group by month(a.order_datetime)
+having b.age>18;
+ 
+
+-- Q.2)Show the most popular category in terms of sales quantity for each country and each gender in 2020.
+Select b.category,a.amount,a.quantity as most_popular_category,c.country,c.gender
+from orders a 
+inner join items b
+on a.item_id=b.item_id
+inner join customer c
+on a.customer_id=c.customer_id
+group by c.gender,c.country
+order by a.quantity desc;
